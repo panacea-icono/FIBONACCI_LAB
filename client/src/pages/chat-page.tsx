@@ -17,20 +17,23 @@ export default function ChatPage() {
   });
 
   useEffect(() => {
-    const ws = connectWebSocket();
+    const socket = connectWebSocket();
 
-    if (ws) {
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === 'chat') {
-          // Actualizar mensajes cuando recibimos uno nuevo
-          queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
-        }
-      };
-    }
+    // Escuchar eventos de chat
+    socket.on('chat', () => {
+      // Actualizar mensajes cuando recibimos uno nuevo
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+    });
+
+    // Escuchar eventos de análisis
+    socket.on('analysis', () => {
+      // Actualizar mensajes cuando recibimos un análisis
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+    });
 
     return () => {
-      if (ws) ws.close();
+      socket.off('chat');
+      socket.off('analysis');
     };
   }, []);
 

@@ -1,52 +1,48 @@
-let ws: WebSocket | null = null;
+import { io, Socket } from 'socket.io-client';
 
-export function connectWebSocket(): WebSocket {
-  if (ws) return ws;
+let socket: Socket | null = null;
 
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsUrl = `${protocol}//${window.location.host}`;
+export function connectWebSocket(): Socket {
+  if (socket) return socket;
 
-  ws = new WebSocket(wsUrl);
+  // Creamos una instancia de socket.io que se conecta a la misma URL que la página
+  socket = io();
 
-  ws.onopen = () => {
-    console.log('WebSocket Conectado');
-  };
+  socket.on('connect', () => {
+    console.log('Socket.IO Conectado');
+  });
 
-  ws.onclose = () => {
-    console.log('WebSocket Desconectado');
-    ws = null;
-    // Reconectar después de 5 segundos
-    setTimeout(connectWebSocket, 5000);
-  };
+  socket.on('disconnect', () => {
+    console.log('Socket.IO Desconectado');
+  });
 
-  ws.onerror = (error) => {
-    console.error('Error de WebSocket:', error);
-  };
+  socket.on('connect_error', (error) => {
+    console.error('Error de conexión Socket.IO:', error);
+  });
 
-  return ws;
+  return socket;
 }
 
-export function getWebSocket(): WebSocket | null {
-  if (!ws || ws.readyState !== WebSocket.OPEN) {
+export function getWebSocket(): Socket | null {
+  if (!socket || !socket.connected) {
     try {
-      ws = connectWebSocket();
+      socket = connectWebSocket();
     } catch (error) {
-      console.error('Error al conectar WebSocket:', error);
+      console.error('Error al conectar Socket.IO:', error);
       return null;
     }
   }
-  return ws;
+  return socket;
 }
 
 export function sendMessage(content: string, senderId: number): void {
   const socket = getWebSocket();
-  if (socket?.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify({
-      type: 'chat',
+  if (socket?.connected) {
+    socket.emit('chat', {
       content,
       senderId
-    }));
+    });
   } else {
-    console.warn('WebSocket no está conectado. El mensaje se enviará solo por HTTP.');
+    console.warn('Socket.IO no está conectado. El mensaje se enviará solo por HTTP.');
   }
 }

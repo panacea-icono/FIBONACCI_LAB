@@ -1,62 +1,53 @@
 import { Server as HTTPServer } from "http";
-import { WebSocketServer } from "ws";
+import { Server } from "socket.io";
 import { storage } from "./storage";
 import { analyzeMessage } from "./openai";
 import type { Message } from "@shared/schema";
 
 export function setupWebSocket(server: HTTPServer) {
-  const wss = new WebSocketServer({ server });
+  const io = new Server(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+  });
 
-  wss.on("connection", (ws) => {
-    console.log("New WebSocket connection");
+  io.on("connection", (socket) => {
+    console.log("New Socket.IO connection");
 
-    ws.on("message", async (data) => {
+    socket.on("chat", async (message) => {
       try {
-        const message = JSON.parse(data.toString()) as {
-          type: string;
-          content: string;
-          senderId: number;
-        };
+        // Broadcast message to all connected clients
+        socket.broadcast.emit("chat", message);
 
-        if (message.type === "chat") {
-          // Broadcast message to all connected clients
-          wss.clients.forEach((client) => {
-            if (client !== ws && client.readyState === WebSocketServer.OPEN) {
-              client.send(JSON.stringify(message));
-            }
-          });
+        // Store message in database
+        const storedMessage = await storage.createMessage({
+          content: message.content,
+          senderId: message.senderId,
+          aiAnalysis: null,
+          sentiment: null
+        });
 
-          // Store message in database
-          const storedMessage = await storage.createMessage({
-            content: message.content,
-            senderId: message.senderId,
-            aiAnalysis: null,
-            sentiment: null
-          });
+        // Analyze message with AI
+        const analysis = await analyzeMessage(message.content);
 
-          // Analyze message with AI
-          const analysis = await analyzeMessage(message.content);
+        // Update the stored message with AI analysis
+        storedMessage.aiAnalysis = analysis.analysis;
+        storedMessage.sentiment = analysis.sentiment;
 
-          // Update the stored message with AI analysis
-          storedMessage.aiAnalysis = analysis.analysis;
-          storedMessage.sentiment = analysis.sentiment;
-
-          // Send analysis back to sender
-          ws.send(JSON.stringify({
-            type: "analysis",
-            messageId: storedMessage.id,
-            analysis: analysis
-          }));
-        }
+        // Send analysis back to sender
+        socket.emit("analysis", {
+          messageId: storedMessage.id,
+          analysis: analysis
+        });
       } catch (error) {
-        console.error("WebSocket error:", error);
-        ws.send(JSON.stringify({ 
-          type: "error", 
+        console.error("Socket.IO error:", error);
+        socket.emit("error", { 
           message: "Error processing message" 
-        }));
+        });
       }
     });
   });
 
-  return wss;
+  return io;
 }
