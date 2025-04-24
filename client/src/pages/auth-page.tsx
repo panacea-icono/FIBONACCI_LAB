@@ -1,198 +1,110 @@
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { insertUserSchema, type InsertUser } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
-import { insertUserSchema } from "@shared/schema";
-import { useLocation } from "wouter";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Redirect } from "wouter";
 import { MessageSquare } from "lucide-react";
 
 export default function AuthPage() {
-  const [location, navigate] = useLocation();
   const { user, loginMutation, registerMutation } = useAuth();
 
-  const loginForm = useForm({
+  const loginForm = useForm<InsertUser>({
     resolver: zodResolver(insertUserSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-    },
   });
 
-  const registerForm = useForm({
+  const registerForm = useForm<InsertUser>({
     resolver: zodResolver(insertUserSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-    },
   });
 
   if (user) {
-    navigate("/");
-    return null;
+    return <Redirect to="/" />;
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 p-4">
-        <div className="flex flex-col justify-center">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              Social Media Assistant
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              Analyze and improve your social media presence with AI-powered insights
-            </p>
-          </div>
-
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center p-4">
+      <div className="w-full max-w-5xl grid md:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <Tabs defaultValue="login">
+            <TabsList className="grid grid-cols-2 w-full">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
-              <Card>
+              <form onSubmit={loginForm.handleSubmit((data) => loginMutation.mutate(data))}>
                 <CardHeader>
-                  <CardTitle>Welcome back</CardTitle>
-                  <CardDescription>
-                    Login to access your dashboard and chats
-                  </CardDescription>
+                  <h2 className="text-2xl font-bold">Bienvenido de nuevo</h2>
                 </CardHeader>
-                <CardContent>
-                  <Form {...loginForm}>
-                    <form
-                      onSubmit={loginForm.handleSubmit((data) =>
-                        loginMutation.mutate(data)
-                      )}
-                      className="space-y-4"
-                    >
-                      <FormField
-                        control={loginForm.control}
-                        name="username"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={loginForm.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={loginMutation.isPending}
-                      >
-                        {loginMutation.isPending ? "Logging in..." : "Login"}
-                      </Button>
-                    </form>
-                  </Form>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="login-username">Usuario</Label>
+                    <Input id="login-username" {...loginForm.register("username")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="login-password">Contraseña</Label>
+                    <Input 
+                      id="login-password" 
+                      type="password" 
+                      {...loginForm.register("password")} 
+                    />
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={loginMutation.isPending}
+                  >
+                    Iniciar Sesión
+                  </Button>
                 </CardContent>
-              </Card>
+              </form>
             </TabsContent>
 
             <TabsContent value="register">
-              <Card>
+              <form onSubmit={registerForm.handleSubmit((data) => registerMutation.mutate(data))}>
                 <CardHeader>
-                  <CardTitle>Create an account</CardTitle>
-                  <CardDescription>
-                    Get started with your social media journey
-                  </CardDescription>
+                  <h2 className="text-2xl font-bold">Crear Cuenta</h2>
                 </CardHeader>
-                <CardContent>
-                  <Form {...registerForm}>
-                    <form
-                      onSubmit={registerForm.handleSubmit((data) =>
-                        registerMutation.mutate(data)
-                      )}
-                      className="space-y-4"
-                    >
-                      <FormField
-                        control={registerForm.control}
-                        name="username"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={registerForm.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={registerMutation.isPending}
-                      >
-                        {registerMutation.isPending
-                          ? "Creating account..."
-                          : "Create account"}
-                      </Button>
-                    </form>
-                  </Form>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="register-username">Usuario</Label>
+                    <Input id="register-username" {...registerForm.register("username")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="register-password">Contraseña</Label>
+                    <Input 
+                      id="register-password" 
+                      type="password" 
+                      {...registerForm.register("password")} 
+                    />
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={registerMutation.isPending}
+                  >
+                    Registrarse
+                  </Button>
                 </CardContent>
-              </Card>
+              </form>
             </TabsContent>
           </Tabs>
-        </div>
+        </Card>
 
-        <div className="hidden md:flex flex-col items-center justify-center p-8">
-          <div className="w-full max-w-md space-y-4">
-            <MessageSquare className="w-16 h-16 text-primary mb-4" />
-            <h2 className="text-2xl font-semibold">
-              Improve Your Social Media Content
-            </h2>
-            <p className="text-muted-foreground">
-              Get real-time AI analysis of your social media content to improve engagement
-              and reach. Our assistant helps you craft better messages and understand
-              your audience.
-            </p>
+        <div className="hidden md:flex flex-col justify-center text-center space-y-6">
+          <div className="mx-auto p-4 rounded-full bg-primary/10">
+            <MessageSquare className="w-12 h-12 text-primary" />
           </div>
+          <h1 className="text-4xl font-bold tracking-tighter">
+            Chat Social Inteligente
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Tu asistente de gestión de redes sociales con IA
+          </p>
         </div>
       </div>
     </div>

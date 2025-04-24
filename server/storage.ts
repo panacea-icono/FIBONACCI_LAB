@@ -1,81 +1,64 @@
-import { User, Message, InsertUser, InsertMessage } from "@shared/schema";
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { Pool } from "@neondatabase/serverless";
+import { users, messages, type InsertUser, type User, type Message } from "@shared/schema";
+import { eq } from "drizzle-orm";
 import session from "express-session";
-import createMemoryStore from "memorystore";
+import connectPg from "connect-pg-simple";
 
-const MemoryStore = createMemoryStore(session);
+const PostgresSessionStore = connectPg(session);
+
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL environment variable is required");
+}
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const db = drizzle(pool);
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
-  getMessages(userId: number): Promise<Message[]>;
-  createMessage(message: InsertMessage): Promise<Message>;
-  updateMessageAnalysis(id: number, analysis: string): Promise<Message>;
-  
+  getMessages(): Promise<Message[]>;
+  createMessage(message: Omit<Message, "id" | "sentAt">): Promise<Message>;
   sessionStore: session.Store;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private messages: Map<number, Message>;
-  private currentUserId: number;
-  private currentMessageId: number;
+export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
 
   constructor() {
-    this.users = new Map();
-    this.messages = new Map();
-    this.currentUserId = 1;
-    this.currentMessageId = 1;
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000,
+    this.sessionStore = new PostgresSessionStore({
+      pool,
+      createTableIfMissing: true,
     });
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const results = await db.select().from(users).where(eq(users.id, id));
+    return results[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const results = await db.select().from(users).where(eq(users.username, username));
+    return results[0];
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values({
+      ...insertUser,
+      avatarUrl: `https://api.dicebear.com/7.x/bottts/svg?seed=${insertUser.username}`
+    }).returning();
     return user;
   }
 
-  async getMessages(userId: number): Promise<Message[]> {
-    return Array.from(this.messages.values()).filter(
-      (message) => message.userId === userId,
-    );
+  async getMessages(): Promise<Message[]> {
+    return await db.select().from(messages).orderBy(messages.sentAt);
   }
 
-  async createMessage(insertMessage: InsertMessage): Promise<Message> {
-    const id = this.currentMessageId++;
-    const message: Message = {
-      ...insertMessage,
-      id,
-      aiAnalysis: null,
-      createdAt: new Date(),
-    };
-    this.messages.set(id, message);
-    return message;
-  }
-
-  async updateMessageAnalysis(id: number, analysis: string): Promise<Message> {
-    const message = this.messages.get(id);
-    if (!message) throw new Error("Message not found");
-    
-    const updated = { ...message, aiAnalysis: analysis };
-    this.messages.set(id, updated);
-    return updated;
+  async createMessage(message: Omit<Message, "id" | "sentAt">): Promise<Message> {
+    const [newMessage] = await db.insert(messages).values(message).returning();
+    return newMessage;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
