@@ -38,3 +38,8 @@ Una aplicación web tipo Telegram con integración de IA para gestión de redes 
 - Panel de análisis de datos
 - Configuración de respuestas automáticas
 - Programación de publicaciones
+---
+
+🔗 **Este proyecto forma parte del Ecosistema PANAS**  
+Consulte [ECOSISTEMA.md](./ECOSISTEMA.md) para más detalles.
+
