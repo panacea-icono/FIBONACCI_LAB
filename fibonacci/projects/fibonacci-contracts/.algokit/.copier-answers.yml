@@ -1,0 +1,19 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: 0.3.2
+_src_path: gh:algorandfoundation/algokit-typescript-template
+author_email: drtapiavargas@gmail.com
+author_name: Dr. Ignacio Tapia Vargas
+code_tours: true
+contract_name: hello_world
+ide_jetbrains: false
+ide_vscode: true
+preset_name: custom
+project_name: fibonacci-contracts
+use_audit: false
+use_dispenser: false
+use_github_actions: false
+use_linter: false
+use_pre_commit: false
+use_prettier: false
+use_vitest: false
+

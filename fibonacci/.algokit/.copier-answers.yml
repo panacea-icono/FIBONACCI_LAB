@@ -1,0 +1,12 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: 2.1.4
+_src_path: gh:algorandfoundation/algokit-fullstack-template
+author_email: drtapiavargas@gmail.com
+author_name: Dr. Ignacio Tapia Vargas
+contract_name: hello_world
+ide_jetbrains: false
+ide_vscode: true
+preset_name: custom
+project_name: fibonacci
+use_github_actions: false
+
