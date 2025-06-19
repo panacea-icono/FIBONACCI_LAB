@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.hero {
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+}

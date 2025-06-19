@@ -1,0 +1,9 @@
+*.tar.gz filter=lfs diff=lfs merge=lfs -text
+*.pt filter=lfs diff=lfs merge=lfs -text
+*.h5 filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
+*.gif filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text
+vercel_hooks/multimedia/**/*.{png,gif,mp4,zip} filter=lfs diff=lfs merge=lfs -text
+vercel_hooks/multimedia.zip filter=lfs diff=lfs merge=lfs -text

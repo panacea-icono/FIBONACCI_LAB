@@ -1,0 +1,47 @@
+import { ArrowRightIcon } from '@heroicons/react/24/solid';
+
+"""
+Este módulo realiza una auditoría del proyecto, incluyendo dependencias,
+variables de entorno, archivos repetidos y estructura de carpetas.
+"""
+
+.hero {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.video-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+    color: white;
+    text-align: center;
+    margin-top: 20%;
+}
+
+def listar_archivos_y_carpetas(ruta):
+    """
+    Lista todos los archivos y carpetas en la ruta especificada.
+
+    Args:
+        ruta (str): Ruta del directorio a analizar.
+
+    Returns:
+        dict: Estructura de archivos y carpetas.
+    """
+    # Código existente...

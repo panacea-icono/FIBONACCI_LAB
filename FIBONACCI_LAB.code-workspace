@@ -7,5 +7,10 @@
 			"path": "../codex-main"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "FIBONACCI_LAB",
+		"cSpell.words": [
+			"Página"
+		]
+	}
 }
