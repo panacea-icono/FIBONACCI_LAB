@@ -1,13 +1,13 @@
 import React from 'react';
+import { ArrowRightIcon } from '@heroicons/react/24/solid'
 
-// import { ArrowRightIcon } from '@heroicons/react/24/solid';
 // import './HeroSection.css';
 
 const HeroSection: React.FC = () => {
   return (
     <div className="hero">
       <div className="video-background">
-        <video autoPlay loop muted>
+        <video autoPlay loop muted preload="metadata">
           <source src="multimedia/videodefondo.mp4" type="video/mp4" />
           Tu navegador no soporta la etiqueta de video.
         </video>

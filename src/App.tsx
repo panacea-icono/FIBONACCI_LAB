@@ -1,10 +1,14 @@
-import React from 'react';
-import HeroSection from './components/HeroSection';
+import React, { Suspense } from 'react';
+import './styles/index.css';
+
+const HeroSection = React.lazy(() => import('./components/HeroSection'));
 
 const App: React.FC = () => {
   return (
     <div>
-      <HeroSection />
+      <Suspense fallback={<div>Cargando...</div>}>
+        <HeroSection />
+      </Suspense>
     </div>
   );
 };
