@@ -1,3 +1,12 @@
+<!-- PANACEA_ECOSYSTEM_HEADER -->
+# FIBONACCI_LAB
+
+> Parte del ecosistema Panacea | Icono SA. Hub: [Ton-telegram](https://github.com/panacea-icono/Ton-telegram)
+
+- Organización: [@panacea-icono](https://github.com/panacea-icono)
+- Documentación de repos: [/docs/REPOSITORIES.md](https://github.com/panacea-icono/Ton-telegram/tree/main/docs/REPOSITORIES.md)
+- Estructura y submódulos: [/docs/REPOS-STRUCTURE.md](https://github.com/panacea-icono/Ton-telegram/tree/main/docs/REPOS-STRUCTURE.md)
+
 # Chat con IA para Gestión de Redes Sociales
 
 Una aplicación web tipo Telegram con integración de IA para gestión de redes sociales.
