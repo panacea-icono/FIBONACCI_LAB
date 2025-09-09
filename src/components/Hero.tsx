@@ -13,7 +13,7 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <div className="hero-container">
       <div className="video-container">
-        <video autoPlay loop muted className="videodefondo">
+        <video autoPlay loop muted preload="metadata" className="videodefondo">
           <source src="/video/video.mp4" type="video/mp4" />
         </video>
         <div className="content">
